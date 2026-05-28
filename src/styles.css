@@ -497,12 +497,47 @@ h1 {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   min-height: 39px;
   max-width: 285px;
   padding: 6px 10px;
   font-size: 17px;
   line-height: 1.04;
+}
+
+.logo-card {
+  min-width: 132px;
+  min-height: 66px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px 10px 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #eef3fb 100%);
+}
+
+.logo-card .logo-frame {
+  display: grid;
+  width: 100%;
+  height: 34px;
+  place-items: center;
+}
+
+.logo-card img {
+  display: block;
+  max-width: 104px;
+  max-height: 34px;
+  object-fit: contain;
+}
+
+.logo-card > span:last-child {
+  max-width: 118px;
+  overflow: hidden;
+  color: #1b2433;
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .game-card.selected,

@@ -13,21 +13,34 @@ const TIERS = [
   { id: 'F', label: 'Never Again', color: '#6c757d' }
 ];
 
+const FAST_FOOD_LOGOS = {
+  'Chick-fil-A': '/logos/fast-food/chick-fil-a.svg',
+  'Taco Bell': '/logos/fast-food/taco-bell.svg',
+  'McDonald’s': '/logos/fast-food/mcdonalds.svg',
+  'Wendy’s': '/logos/fast-food/wendys.svg',
+  'In-N-Out': '/logos/fast-food/in-n-out.svg',
+  Chipotle: '/logos/fast-food/chipotle.svg',
+  'Panda Express': '/logos/fast-food/panda-express.svg',
+  Subway: '/logos/fast-food/subway.svg',
+  'Five Guys': '/logos/fast-food/five-guys.svg',
+  'Dairy Queen': '/logos/fast-food/dairy-queen.svg'
+};
+
 const DEFAULT_CATEGORIES = [
   {
     id: 'fast-food',
     name: 'Fast Food',
     items: [
-      'Chick-fil-A',
-      'Taco Bell',
-      'McDonald’s',
-      'Wendy’s',
-      'In-N-Out',
-      'Chipotle',
-      'Panda Express',
-      'Subway',
-      'Five Guys',
-      'Dairy Queen'
+      { name: 'Chick-fil-A', logo: '/logos/fast-food/chick-fil-a.svg' },
+      { name: 'Taco Bell', logo: '/logos/fast-food/taco-bell.svg' },
+      { name: 'McDonald’s', logo: '/logos/fast-food/mcdonalds.svg' },
+      { name: 'Wendy’s', logo: '/logos/fast-food/wendys.svg' },
+      { name: 'In-N-Out', logo: '/logos/fast-food/in-n-out.svg' },
+      { name: 'Chipotle', logo: '/logos/fast-food/chipotle.svg' },
+      { name: 'Panda Express', logo: '/logos/fast-food/panda-express.svg' },
+      { name: 'Subway', logo: '/logos/fast-food/subway.svg' },
+      { name: 'Five Guys', logo: '/logos/fast-food/five-guys.svg' },
+      { name: 'Dairy Queen', logo: '/logos/fast-food/dairy-queen.svg' }
     ]
   },
   {
@@ -71,10 +84,13 @@ function slugify(value) {
     .replace(/(^-|-$)/g, '') || `category-${Date.now()}`;
 }
 
-function makeCard(name) {
+function makeCard(item) {
+  const card = typeof item === 'string' ? { name: item } : item;
+
   return {
     id: crypto.randomUUID(),
-    name,
+    name: card.name,
+    logo: card.logo || null,
     tier: null
   };
 }
@@ -99,9 +115,17 @@ function loadState() {
     if (!saved) return createDefaultState();
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed.categories)) return createDefaultState();
+    const categories = parsed.categories.map((category) => ({
+      ...category,
+      cards: category.cards.map((card) => ({
+        ...card,
+        logo: card.logo || (category.id === 'fast-food' ? FAST_FOOD_LOGOS[card.name] : null) || null
+      }))
+    }));
     return {
       ...createDefaultState(),
       ...parsed,
+      categories,
       screen: parsed.screen === 'results' ? 'select' : parsed.screen || 'select'
     };
   } catch {
@@ -691,7 +715,7 @@ function EditPanel({ category, newCardName, setNewCardName, onAddCard, onRenameC
 function GameCard({ card, selected, onSelect, onDragStart, onRemoveFromTier, canEdit, onRenameCard, onDeleteCard }) {
   return (
     <button
-      className={selected ? 'game-card selected' : 'game-card'}
+      className={`${selected ? 'game-card selected' : 'game-card'}${card.logo ? ' logo-card' : ''}`}
       draggable
       onDragStart={(event) => onDragStart(event, card.id)}
       onClick={() => onSelect(card.id)}
@@ -703,6 +727,13 @@ function GameCard({ card, selected, onSelect, onDragStart, onRemoveFromTier, can
           onClick={(event) => event.stopPropagation()}
           aria-label="Card name"
         />
+      ) : card.logo ? (
+        <>
+          <span className="logo-frame">
+            <img src={card.logo} alt="" />
+          </span>
+          <span>{card.name}</span>
+        </>
       ) : (
         <span>{card.name}</span>
       )}
